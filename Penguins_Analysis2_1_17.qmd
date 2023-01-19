@@ -76,7 +76,7 @@ penguins %>%
 
 #we can also do both
 penguins %>%
-  filter(body_mass_g >= 6000) | (island == "Torgersen"))
+  filter((body_mass_g >= 6000) | (island == "Torgersen"))
   
 
 
@@ -151,4 +151,50 @@ Average Body mass by year
 penguins %>%
   group_by(year) %>%
   summarize(mean_body_mass = mean(body_mass_g))
+```
+
+# Data Visualization
+
+-   What is the distribution of penguin flipper lengths?
+
+-   What is the distribution of penguin species?
+
+-   Does the distribution of flipper length depend on the species of penguin?
+
+    ```{r}
+    penguins %>%
+      ggplot() + 
+      geom_histogram( aes(x = flipper_length_mm), 
+                      bins = 15, 
+                      fill = "red",
+                      color = "blue") +
+      labs(title = "Distribution of Flipper Length (mm)", 
+           subtitle = "Mean in Black, Median in Yellow",
+          y = "",
+          x = "Flipper Length (mm)" ) +
+      geom_vline(aes(xintercept = mean(flipper_length_mm)), lwd = 2, lty = "dashed" ) +
+      geom_vline(aes(xintercept = median(flipper_length_mm)), color = "yellow", lwd = 2, lty = "dotted")
+
+
+    ```
+
+We will now look at the distribution of species.
+
+```{r}
+penguins %>%
+ggplot() + 
+  geom_bar(mapping = aes(x = species), color = "black", fill ="blue") + 
+  labs(title = "Counts of Penguin Species")
+       x = "Species", y = "Count")
+```
+
+Let's make a scatter plot to see if bill length is correlated with bill depth
+
+```{r}
+penguins %>%
+  ggplot() +
+  geom_point(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_smooth(aes(x = bill_length_mm, y = bill_depth_mm, color = species), method = "lm")
+
+
 ```

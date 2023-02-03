@@ -1,0 +1,92 @@
+---
+title: "Great Lakes Fish"
+format: html
+editor: visual
+author: "Skylar Pietz"
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+fishing <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-06-08/fishing.csv')
+stocked <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-06-08/stocked.csv')
+```
+
+# About Our Data
+
+The data I am working with is a data set on fish in the Great Lakes, which includes 7 variables on 65,706 fish. The variables included are qualitative such as fish specie, the specific lake the species was found, the region the lake is located, as well as variables such as the year the fish species is found, the grand total, and values.
+
+```{r}
+#install.packages("tidymodels")
+library(tidymodels)
+library(tidyverse)
+library(kableExtra)
+my_data_splits <- initial_split(fishing, prop= 0.5)
+exploratory_data <- training(my_data_splits)
+test_data <- testing(my_data_splits)
+
+#See the first six rows of the data we've read in to our notebook
+exploratory_data %>%
+  head(10) %>%
+  kable() %>%
+  kable_styling(c("striped", "hover"))
+
+
+```
+
+# About Data cont...
+
+I split the data into exploratory and test data using the code above. My exploratory data includes 7 variables of 32,853 fish. These variable include year of measurement, lake name, species of fish, grand total of observed, region of the US/Canada, and value of production amounts.
+
+# Interesting Questions to Ask
+
+-   What species was observed the most throughout the lakes and regions? (overall grand total)
+
+-   Which specific lake housed the greatest amount of this species?
+
+-   In what region were the most fish found overall?
+
+-   What species yield the greatest production value?
+
+```{r}
+install.packages("skimr")
+library(skimr)
+    exploratory_data %>%
+      skim()
+    
+```
+
+```{r}
+exploratory_data %>%
+  count(species)
+```
+
+```{r}
+exploratory_data %>%
+  count(lake)
+```
+
+```{r}
+exploratory_data %>%
+ggplot() + 
+  geom_bar(mapping = aes(x = species), color = "black", fill ="blue") + 
+  labs(title = "Counts of Fish Species",
+       x = "Species" , y = "Count") +
+  coord_flip() +
+  facet_wrap(~lake, scales = "free")
+       
+```
+
+# Answering My Questions:
+
+-   Based on the exploratory data, the Lake Whitefish was observed the most throughout the lakes and regions.
+
+# Hypothesis
+
+-   I hypothesize that since the Lake Whitefish species is most abundant then this species will also have the greatest value (production amount).

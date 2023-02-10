@@ -1,0 +1,135 @@
+---
+title: "Great Lakes Fish"
+format: html
+editor: visual
+author: "Skylar Pietz"
+---
+
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+
+```{r}
+fishing <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-06-08/fishing.csv')
+stocked <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-06-08/stocked.csv')
+```
+
+```{r}
+#install.packages("tidymodels")
+library(tidymodels)
+library(tidyverse)
+library(kableExtra)
+my_data_splits <- initial_split(fishing, prop= 0.5)
+exploratory_data <- training(my_data_splits)
+test_data <- testing(my_data_splits)
+
+#See the first six rows of the data we've read in to our notebook
+exploratory_data %>%
+  head(10) %>%
+  kable() %>%
+  kable_styling(c("striped", "hover"))
+
+
+```
+
+```{r}
+install.packages("skimr")
+library(skimr)
+    exploratory_data %>%
+      skim()
+    
+```
+
+```{r}
+exploratory_data %>%
+  count(species)
+```
+
+```{r}
+exploratory_data %>%
+  count(lake)
+```
+
+```{r}
+exploratory_data %>%
+ggplot() + 
+  geom_bar(mapping = aes(x = species), color = "black", fill ="blue") + 
+  labs(title = "Counts of Fish Species",
+       x = "Species" , y = "Count") +
+  coord_flip() +
+  facet_wrap(~lake, scales = "free")
+       
+```
+
+```{r}
+exploratory_data %>%
+ggplot() + 
+  geom_bar(mapping = aes(x = species), color = "black", fill ="blue") + 
+  labs(title = "Counts of Fish Species",
+       x = "Species" , y = "Count") +
+  coord_flip() 
+  
+```
+
+```{r}
+exploratory_data %>%
+ggplot() + 
+  geom_boxplot(mapping = aes(x = species , y = values), color = "black", fill ="blue") + 
+  labs(title = "Values of Fish Species",
+       x = "Species" , y = "Value") +
+  coord_flip() +
+  scale_y_log10()
+```
+
+
+# Hypothesis
+
+-   I hypothesize that since the Lake Whitefish species is most abundant then this species will also have the greatest value (production amount).
+
+# Abstract
+
+The Great Lakes Fish data set comes from Great Lakes Fish Commission and includes 7 variables on 65,706 fish. I have decided to ask and provide answers to different questions such as...
+
+-   What species was observed the most throughout the lakes and regions? (overall grand total)
+
+-   In what region were the most fish found overall?
+
+-   Which specific lake housed the greatest amount of the most abundant species found in question 1?
+
+-   What species yield the greatest production value?
+
+# Introduction
+
+The data I am working with is a data set on fish in the Great Lakes. The variables included are qualitative such as fish species, the specific lake the species was found, the region the lake is located, as well as variables such as the year the fish species is found, the grand total, and values.
+
+I split the data into exploratory and test data using the code above. My exploratory data includes 7 variables of 32,853 fish. These variable include year of measurement, lake name, species of fish, grand total of observed, region of the US/Canada, and value of production amounts.
+
+# Exploratory Analysis
+
+-   I first used code to create a table that organized the count of each species in my exploratory data. One potential source of error that might affect my data analysis is that some of the species were grouped and counted together and/or the same species was counted two separate times. The code I used to create a species count table resulted in a 51 x 2 table but there are actually less than 51 species due to some of them being repeated. To the best of my ability, I tried to estimate which species was counted the most throughout the lakes and regions and determined that, based on my exploratory data, the Lake Whitefish was observed the most.
+
+-   I then created another table that represents the count of fish in each lake. From the table I can see that 6 different lakes were observed with Lake Michigan holding the greatest amount of fish (9,590).
+
+    | Lake        | n (count) |
+    |-------------|-----------|
+    | Erie        | 7263      |
+    | Huron       | 8621      |
+    | Michigan    | 9590      |
+    | Ontario     | 2317      |
+    | Saint Clair | 1164      |
+    | Superior    | 3898      |
+
+-   In order to answer the third question I used ggplot code and geom_bar code to create a bar graph of counts of fish species in each of the six lakes. Doing so, I am allowed to visualize the amount of each type of fish found in each of the different bodies of water. Compared to the rest of the species found in each lake, the Lake Whitefish species was most abundant in Lake Erie, Lake Huron, and Lake Ontario. Interestingly, Lake Michigan actually had the most Lake Whitefish at around 640. However, the Lake Whitefish species was the second highest count in Lake Michigan with the Lake Trout species being the greatest count in this lake at about 650.
+
+-   The last question was answered by using r code to create a box plot of fish species and their values. It was determined that the values variables represents the amount of fish in thousand pounds that was collected and sold to other fisheries and commercial fishery businesses in the industry throughout the regions. The visual was made by using ggplot code and geom_box plot to create a box plot of each species and their value (production amounts) rounded to the nearest thousands pounds throughout the whole lakes region. Based on the box plot, it is evident that the Alewife species yielded the highest production amount.
+
+# Hypothesis Analysis
+
+In my hypothesis I stated that if the Lake Whitefish species is most abundant then this species will also have the greatest value (production amount). I determined that my hypothesis was incorrect. Although the bar graph shows the Lake Whitefish species was most abundant with the highest count across all the lakes, the box-plot shows that the Alewife species yields the highest value in production across all the lakes and regions. Therefore, I must reject my hypothesis.
+

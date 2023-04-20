@@ -1,0 +1,29 @@
+---
+title: "Extinct_Plants"
+author: "Skylar Pietz"
+format: html
+editor: visual
+---
+
+## Extinct Plants 
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+#Load the tidyverse
+library(tidyverse)
+library(kableExtra)
+
+#Read the penguins_samp1 data file from github
+plants_wide <- read_csv("https://raw.githubusercontent.com/Z3tt/TidyTuesday/master/data/raw_plants/plants_extinct_wide.csv")
+
+#See the first six rows of the data we've read in to our notebook
+plants_wide %>%
+  head(2) %>%
+  kable() %>%
+  kable_styling(c("striped", "hover"))
+```

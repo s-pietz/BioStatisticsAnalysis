@@ -7,54 +7,21 @@ editor: visual
 
 # Volcano Eruptions
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+## Abstract
 
-## Running Code
+The Volcano Eruptions data comes from The Smithsonian Institution and includes volcanic eruptions that were reported from the past 2,500 years. It includes 15 variables measured on 11,178 total observed volcanoes. This data set allows me to ask interesting questions like
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+-   Were there more confirmed or unconfirmed eruptions reported in total?
 
-```{r}
-# Get the Data
+-   Which volcano recorded the highest number of confirmed eruptions?
 
-volcano <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/volcano.csv')
+-   In what area did the most reported eruptions occur?
 
+## Introduction
 
-```
+The data I am analyzing is a data set on Volcanic Eruptions. The variables include quantitative features (like latitude and longitude) of the eruptions, as well as qualitative features like volcano number (the volcano's unique ID), volcano name, eruption category (type of eruption), area of activity, etc.
 
-```{r}
-#Load the tidyverse
-library(tidyverse)
-library(kableExtra)
-
-#Read the volcano data file from github
-volcano <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/volcano.csv')
-
-#See the first six rows of the data we've read in to our notebook
-volcano %>%
-  head(2) %>%
-  kable() %>%
-  kable_styling(c("striped", "hover"))
-```
-
-```{r}
-#install.packages("tidymodels")
-library(tidymodels)
-#install.packages("skimr")
-library(skimr)
-
-library(skimr)
-volcano %>%
-  skim()
-
-volcano %>%
-  head(10) %>%
-  kable() %>%
-  kable_styling(c("striped", "hover"))
-```
-
-## About the Data
-
-The data I am working with is a data set on Volcanic eruptions that comes from The Smithsonian Institution. This data set includes 26 variables measured on 958 volcanoes. The variables include quantitative features l(ike latitude, longitude, elevation, etc) as well as qualitative features (like volcano number, volcano name, primary volcano type, last eruption year, country, and region).
+Since the data set is so large, I first began by using code to split the file in half to "exploratory data" and "test data". The exploratory data now contains 15 variables measured on 5589 volcanoes.
 
 ### More Background on Volcanoes
 
@@ -66,19 +33,56 @@ Erupting volcanoes can pose many hazards, not only in the immediate vicinity of 
 
 The researchers detected 238 eruptions from the past 2,500 years, they report today in Nature. About half were in the mid- to high-latitudes in the northern hemisphere, while 81 were in the tropics. (Because of the rotation of the Earth, material from tropical volcanoes ends up in both Greenland and Antarctica, while material from northern volcanoes tends to stay in the north.)
 
+### Reading Data into the Notebook & Installing Packages
+
 ```{r}
-my_data_splits <- initial_split(volcano, prop= 0.5)
+#Load the tidyverse
+library(tidyverse)
+library(kableExtra)
+
+#install.packages("tidymodels")
+library(tidymodels)
+
+#install.packages("skimr")
+library(skimr)
+
+volcano <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/volcano.csv')
+
+eruptions <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/eruptions.csv')
+```
+
+```{r}
+library(skimr)
+eruptions %>%
+  skim()
+```
+
+```{r}
+eruptions %>%
+  head() %>%
+  kable() %>%
+  kable_styling(c("hover", "striped"))
+```
+
+### Splitting the Data
+
+Here is where I split the data file in half into exploratory data and test data. The exploratory data now contains 15 variables measured on 5589 volcanoes.
+
+```{r}
+my_data_splits <- initial_split(eruptions, prop = 0.5)
+
 exploratory_data <- training(my_data_splits)
 test_data <- testing(my_data_splits)
+```
 
-#See the first six rows of the data we've read in to our notebook
+This initial_split function, used above, created a single binary split of the data into an exploratory set and a test set. This way I have a smaller more specified list of eruptions to work with. I can also change "eruptions" to "volcano" to view some different data and variables on the volcanoes.
+
+```{r}
 exploratory_data %>%
   head(10) %>%
   kable() %>%
   kable_styling(c("striped", "hover"))
 ```
-
-Since the data set is so large, I first began by splitting the file in half into exploratory data and test data. The exploratory data now contains 26 variables measured on 479 observations.
 
 ```{r}
 install.packages("skimr")
@@ -90,26 +94,53 @@ library(skimr)
       skim()
 ```
 
-```{r}
-exploratory_data %>%
-  count(primary_volcano_type)
-```
-
-```{r}
-exploratory_data %>%
-  count(country)
-```
-
-```{r}
-exploratory_data %>%
-ggplot() + 
-  geom_bar(mapping = aes(x = primary_volcano_type), color = "black", fill ="blue") + 
-  labs(title = "Volcano Type Count by Country",
-       x = "Volcano Type" , y = "Count") + 
-  coord_flip() +
-  facet_wrap(~country, scales = "free")
-```
-
 ## Hypothesis
 
--   I hypothesize that since
+-   I hypothesize that although volcanoes exist all over the globe, the most active volcanoes with confirmed eruptions are located in nearby areas/regions on the map.
+
+## Exploratory Analysis
+
+After I used code to split the data, I then used code and piping to create a table that organized the exploratory data by it's reported variables. The table generated appears as follows. It shows 5,589 rows by 15 columns. The rows represent the 5,589 volcanoes and the columns represent the 15 different variables in which the volcanoes were measured/observed.
+
+```{r}
+exploratory_data
+```
+
+Eruptions are categorized into three different types. These include Confirmed Eruption, Discredited Eruption, and Uncertain Eruption. I used the count function to figure out how many of each eruption category were observed in the volcanoes. This is shown here:
+
+```{r}
+exploratory_data %>%
+  count(eruption_category)
+```
+
+As one can see, there were 4,978 confirmed eruptions, 76 discredited eruptions, and 535 uncertain eruptions. This data is helpful in me answering my first question of whether there were more confirmed or unconfirmed eruptions. The data presented shows me that there were many more confirmed eruptions, at 4978.
+
+I then created another table but used the group_by function to organize it by volcano name and the count function to count each type of eruption for that volcano. Lastly, the arrange function changes the way the data is presented by organizing it in order from the volcano with the highest number of eruptions first to the one with the least. The table generated is shown below:
+
+```{r}
+exploratory_data %>%
+  group_by(volcano_name) %>%
+  count(eruption_category) %>%
+  arrange(-n)
+```
+
+Based on the table above, I am able to determine which volcanoes have erupted the highest number of confirmed times. It's evident that the volcano named "Fournaise, Piton de la" has 97 confirmed eruptions. "Etna" is a close second with 94 confirmed eruptions. This data helps me answer my second question of which volcano recorded the highest number of confirmed eruptions, with the answer being "Fournaise, Piton de la" with 97 confirmed eruptions within the last 2,500 years.
+
+I used the same functions to create a similar yet different table that shows me the area with the highest volcanic activity. The table appears below:
+
+```{r}
+exploratory_data %>%
+  group_by(area_of_activity) %>%
+  count(eruption_category) %>%
+  arrange(-n)
+```
+
+Looking at this table, it's evident that the area with the highest volcanic activity is not available (NA). The confirmed eruptions in this area within the past 2,500 years is 2724, along with 411 uncertain eruptions and 76 discredited eruptions. The next named area of activity is Naka-dake, with 73 confirmed eruptions. I did some further research and found out that Mt. Aso Nakadake in Aso-Kuju National Park, central Kyushu, is Japan's most active volcano. The huge caldera stretches 24 kilometeres from north to south, surrounded by 5 peaks, known collectively as Aso Gogaku. The Mt. Nakadake crater is still active. Therefore, the answer to my last question (which asks in what area did the most reported eruptions occur?), is Naka-dake.
+
+## Hypothesis Analysis
+
+In my hypothesis I stated that although volcanoes exist all over the globe, the most active volcanoes with confirmed eruptions are located in nearby areas on the map. From my last code block, I was able to determine that a certain area had the most activity based on confirmed eruptions. This resulted in the area of Naka-dake. I was hoping to use ggplot to create a graph or map that would help to better visualize where the most active volcanoes were located based on a global level. I was unsure how to do this with many trial and errors using code. However, I can see that the names of the areas with the most activity appear to be in the eastern Japan and eastern Asia region.
+
+## Conclusions 
+
+In conclusion, I was able to use and interpret the volcano eruptions data set for many different aspects of the analysis. I used it to perform various code runs to better analyze the volcanic activity of numerous volcanoes from the past 2,500 years. Based on this data set, environmental scientists and researchers can estimate what volcanoes are the most active and where they are located. They could also use the data to possibly predict which volcano is due to erupt next. By using the data to perform tests and functions and then making predictions about future volcanic activity, we could take action in preventing potential harm and destruction to human society and all other organisms living on earth.

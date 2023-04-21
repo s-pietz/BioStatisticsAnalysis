@@ -18,7 +18,7 @@ When you click the **Render** button a document will be generated that includes 
 
 volcano <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/volcano.csv')
 
-eruptions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/eruptions.csv')
+
 ```
 
 ```{r}
@@ -54,11 +54,62 @@ volcano %>%
 
 ## About the Data
 
-The data I am working with is a data set on volcanic eruptions that comes from The Smithsonian Institiution. This study describes
+The data I am working with is a data set on Volcanic eruptions that comes from The Smithsonian Institution. This data set includes 26 variables measured on 958 volcanoes. The variables include quantitative features l(ike latitude, longitude, elevation, etc) as well as qualitative features (like volcano number, volcano name, primary volcano type, last eruption year, country, and region).
+
+### More Background on Volcanoes
+
+A volcano is a rupture in the crust of a planetary-mass object, such as Earth, that allows hot lava, volcanic ash, and gases to escape from a magma chamber below the surface.
+
+Earth's volcanoes occur because its crust is broken into 17 major, rigid tectonic plates that float on a hotter, softer layer in its mantle. Therefore, on Earth, volcanoes are generally found where tectonic plates are diverging or converging, and most are found underwater
+
+Erupting volcanoes can pose many hazards, not only in the immediate vicinity of the eruption. One such hazard is that volcanic ash can be a threat to aircraft, in particular those with jet engines where ash particles can be melted by the high operating temperature; the melted particles then adhere to the turbine blades and alter their shape, disrupting the operation of the turbine. Large eruptions can affect temperature as ash and droplets of sulfuric acid obscure the sun and cool the Earth's lower atmosphere (or troposphere); however, they also absorb heat radiated from the Earth, thereby warming the upper atmosphere (or stratosphere). Historically, volcanic winters have caused catastrophic famines.
+
+The researchers detected 238 eruptions from the past 2,500 years, they report today in Nature. About half were in the mid- to high-latitudes in the northern hemisphere, while 81 were in the tropics. (Because of the rotation of the Earth, material from tropical volcanoes ends up in both Greenland and Antarctica, while material from northern volcanoes tends to stay in the north.)
 
 ```{r}
-volcano %>%
+my_data_splits <- initial_split(volcano, prop= 0.5)
+exploratory_data <- training(my_data_splits)
+test_data <- testing(my_data_splits)
+
+#See the first six rows of the data we've read in to our notebook
+exploratory_data %>%
+  head(10) %>%
+  kable() %>%
+  kable_styling(c("striped", "hover"))
+```
+
+Since the data set is so large, I first began by splitting the file in half into exploratory data and test data. The exploratory data now contains 26 variables measured on 479 observations.
+
+```{r}
+install.packages("skimr")
+```
+
+```{r}
+library(skimr)
+    exploratory_data %>%
+      skim()
+```
+
+```{r}
+exploratory_data %>%
   count(primary_volcano_type)
 ```
 
-## Interesting Questions to Ask
+```{r}
+exploratory_data %>%
+  count(country)
+```
+
+```{r}
+exploratory_data %>%
+ggplot() + 
+  geom_bar(mapping = aes(x = primary_volcano_type), color = "black", fill ="blue") + 
+  labs(title = "Volcano Type Count by Country",
+       x = "Volcano Type" , y = "Count") + 
+  coord_flip() +
+  facet_wrap(~country, scales = "free")
+```
+
+## Hypothesis
+
+-   I hypothesize that since
